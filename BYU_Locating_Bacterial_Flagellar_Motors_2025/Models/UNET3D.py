@@ -59,36 +59,36 @@ class UNet3D(nn.Module):
         self.out_conv = nn.Conv3d(32, out_channels, kernel_size=1)
 
     def forward(self, x):
-        e1 = self.encoder1(x)     # (B, 32, D, H, W)
-        p1 = self.pool1(e1)       # (B, 32, D/2, H/2, W/2)
+        e1 = self.encoder1(x)
+        p1 = self.pool1(e1)
 
-        e2 = self.encoder2(p1)    # (B, 64, ...)
-        p2 = self.pool2(e2)       # (B, 64, D/4, H/4, W/4)
+        e2 = self.encoder2(p1)
+        p2 = self.pool2(e2)
 
-        e3 = self.encoder3(p2)    # (B, 128, ...)
-        p3 = self.pool3(e3)       # (B, 128, D/8, H/8, W/8)
+        e3 = self.encoder3(p2)
+        p3 = self.pool3(e3)
 
-        e4 = self.encoder4(p3)    # (B, 256, ...)
-        p4 = self.pool4(e4)       # (B, 256, D/16, H/16, W/16)
+        e4 = self.encoder4(p3)
+        p4 = self.pool4(e4)
 
         # bottleneck
-        b = self.bottleneck(p4)   # (B, 512, D/16, H/16, W/16)
+        b = self.bottleneck(p4)
 
-        up4 = self.up4(b)         # (B, 256, D/8, H/8, W/8)
-        cat4 = torch.cat([up4, e4], dim=1)  # (B, 256+256, ...)
-        d4 = self.decoder4(cat4)  # (B, 256, ...)
+        up4 = self.up4(b)
+        cat4 = torch.cat([up4, e4], dim=1)
+        d4 = self.decoder4(cat4)
 
-        up3 = self.up3(d4)        # (B, 128, D/4, H/4, W/4)
-        cat3 = torch.cat([up3, e3], dim=1)  # (B, 128+128, ...)
-        d3 = self.decoder3(cat3)  # (B, 128, ...)
+        up3 = self.up3(d4)
+        cat3 = torch.cat([up3, e3], dim=1)
+        d3 = self.decoder3(cat3)
 
-        up2 = self.up2(d3)        # (B, 64, D/2, H/2, W/2)
-        cat2 = torch.cat([up2, e2], dim=1)  # (B, 64+64, ...)
-        d2 = self.decoder2(cat2)  # (B, 64, ...)
+        up2 = self.up2(d3)
+        cat2 = torch.cat([up2, e2], dim=1)
+        d2 = self.decoder2(cat2)
 
-        up1 = self.up1(d2)        # (B, 32, D, H, W)
-        cat1 = torch.cat([up1, e1], dim=1)  # (B, 32+32, D, H, W)
-        d1 = self.decoder1(cat1)  # (B, 32, D, H, W)
+        up1 = self.up1(d2)
+        cat1 = torch.cat([up1, e1], dim=1)
+        d1 = self.decoder1(cat1)
 
-        out = self.out_conv(d1)   # (B, out_channels, D, H, W)
+        out = self.out_conv(d1)
         return out
